@@ -1,22 +1,23 @@
-from rest_framework import serializers
 from .models import Blog
+from django.contrib.auth.models import User
+
+from rest_framework import serializers
+
+
+class UserSerializer(serializers.ModelSerializer):
+    blogs = serializers.PrimaryKeyRelatedField(many=True, queryset=Blog.objects.all())
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'blogs')
 
 
 class BlogSerializer(serializers.ModelSerializer):
-    """
-    We are creating this serializer class to serialize and deserialize the content to
-    JSON format to sent to the different clients. This is almost similar to form API in
-    django.
+    owner = serializers.ReadOnlyField(source='owner.username')
 
-    When using ModelSerializer class, we only needed to give the model's name,
-    the create and update statement will have default implementation.
-
-    We have JSONParser and JSONRender to convent the object to json and vice versa.
-    """
     class Meta:
         model = Blog
-        fields = ('id', 'title', 'content')
-
+        fields = ('id', 'owner', 'title', 'content')
 
 
 

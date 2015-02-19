@@ -1,63 +1,91 @@
 from django.http import HttpResponse
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import generics
+from rest_framework import permissions
+
+from django.contrib.auth.models import User
 from .models import Blog
-from django.views.decorators.csrf import csrf_exempt
-from .serializers import BlogSerializer
+from .serializers import BlogSerializer, UserSerializer
+from .permissions import IsOwnerOrReadOnly
+# # Create your views here.
+# class JSONResponse(HttpResponse):
+#     """
+#     We are inheritting the property of a HttpResponse object to behave as a JSONResponse.
+#     """
+#     def __init__(self, data, **kwargs):
+#         content = JSONRenderer().render(data)
+#         kwargs['content_type'] = 'application/json'
+#         super(JSONResponse, self).__init__(content, **kwargs)
 
-# Create your views here.
-class JSONResoponse(HttpResponse):
-    """
-    We are inheritting the property of a HttpResponse object to behave as a JSONResoponse.
-    """
-    def __init__(self, data, **kwargs):
-        content = JSONRenderer().render(data)
-        kwargs['content_type'] = 'application/json'
-        super(JSONResoponse, self).__init__(content, **kwargs)
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
-@csrf_exempt
-def blog_list(request):
+class UserDetails(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class BlogList(APIView):
     """
     This function is to list all blogs and create new blogs,
     NOTE: This function is not used for updating blogs.
     """
-    if request.method == "GET":
+
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        import pdb; pdb.set_trace()
+        return super(BlogList, self). perform_create(serializer)
+
+    def get(self, request, format=None):
         blog = Blog.objects.all()
         serializer = BlogSerializer(blog, many=True)
-        return JSONResoponse(serializer.data)
+        return Response(serializer.data)
 
-    elif request.method == "POST":
-        data = JSONParser().parser(request)
-        serializer = BlogSerializer(data=data)
+    def post(self, request, format=None):
+        serializer = BlogSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return JSONResoponse(serializer.data, status=201)
-        return JSONResoponse(serializer.errors, status=400)
+            serializer.save(owner=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@csrf_exempt
-def blog_details(request, pk):
+
+
+class BlogDetails(APIView):
     """
     This function is to Retrive, Update or Delete, the Blog
     """
-    try:
-        blog = Blog.objects.get(pk=pk)
-    except Blog.DoesNotExist:
-        return HttpResponse(status=404)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly,)
 
-    if request.method == "GET":
+    def get_object(self, pk):
+        try:
+            return Blog.objects.get(pk=pk)
+        except Blog.DoesNotExist:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, pk, format=None):
+        blog = self.get_object(pk)
         serializer = BlogSerializer(blog)
-        return JSONResoponse(serializer)
+        return Response(serializer.data)
 
-    elif request.method == "PUT":
-        data = JSONParser().parse(request)
-        serializer = BlogSerializer(blog, data=data)
+    def put(self, request, pk, format=None):
+        blog = self.get_object(pk)
+        serializer = BlogSerializer(blog, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResoponse(serializer)
-        return JSONResoponse(serializer.errors, status=404)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == "DELETE":
+    def delete(self, request, pk, format=None):
+        blog = self.get_object(pk)
         blog.delete()
-        return HttpResponse(status=400)
+        return Response(status=status.HTTP_204_NO_CONTENT)
