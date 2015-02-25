@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 
-class UserSerializer(serializers.ModelSerializer):
-    blogs = serializers.PrimaryKeyRelatedField(many=True, queryset=Blog.objects.all())
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    blogs = serializers.HyperlinkedRelatedField(many=True, view_name='blogger:blog-details', read_only=True)
 
     class Meta:
         model = User
@@ -17,7 +17,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ('id', 'owner', 'title', 'content')
+        fields = ('id', 'owner', 'title', 'content', 'likes', 'comment')
 
 
 

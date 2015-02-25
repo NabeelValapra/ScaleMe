@@ -5,20 +5,22 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework.decorators import api_view
+from rest_framework.reverse import reverse
 
 from django.contrib.auth.models import User
 from .models import Blog
 from .serializers import BlogSerializer, UserSerializer
 from .permissions import IsOwnerOrReadOnly
-# # Create your views here.
-# class JSONResponse(HttpResponse):
-#     """
-#     We are inheritting the property of a HttpResponse object to behave as a JSONResponse.
-#     """
-#     def __init__(self, data, **kwargs):
-#         content = JSONRenderer().render(data)
-#         kwargs['content_type'] = 'application/json'
-#         super(JSONResponse, self).__init__(content, **kwargs)
+
+
+@api_view(('GET',))
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('blogger:user-list', request=request, format=format),
+        'blogs': reverse('blogger:blog-list', request=request, format=format),
+        })
+
 
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
@@ -55,8 +57,6 @@ class BlogList(APIView):
             serializer.save(owner=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class BlogDetails(APIView):
