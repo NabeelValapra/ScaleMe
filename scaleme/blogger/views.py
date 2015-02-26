@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.contrib.auth.models import User
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -8,10 +9,10 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 
-from django.contrib.auth.models import User
 from .models import Blog
 from .serializers import BlogSerializer, UserSerializer
 from .permissions import IsOwnerOrReadOnly
+from .tasks import email_hello
 
 
 @api_view(('GET',))
@@ -41,11 +42,6 @@ class BlogList(APIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly,)
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-        import pdb; pdb.set_trace()
-        return super(BlogList, self). perform_create(serializer)
-
     def get(self, request, format=None):
         blog = Blog.objects.all()
         serializer = BlogSerializer(blog, many=True)
@@ -55,6 +51,7 @@ class BlogList(APIView):
         serializer = BlogSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(owner=request.user)
+            email_hello.delay()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
