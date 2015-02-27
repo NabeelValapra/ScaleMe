@@ -17,7 +17,3 @@ EMAIL_HOST_PASSWORD = 'nabeelnabeel'
 DEFAULT_FROM_EMAIL = 'pymailone@gmail.com'
 SERVER_EMAIL = 'pymailone@gmail.com'
 
-
-# CELERY
-BROKER_URL = 'redis://127.0.0.1:6379/0'
-BROKER_TRANSPORT = 'redis'

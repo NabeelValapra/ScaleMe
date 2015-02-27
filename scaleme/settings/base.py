@@ -1,6 +1,6 @@
-
-from os.path import dirname, join
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from os.path import dirname, join
+
 ROOT_DIR = dirname(dirname(__file__))
 APP_DIR = join(ROOT_DIR, 'junction')
 
@@ -31,6 +31,7 @@ THIRD_PARTY_APPS = (
     'debug_toolbar',
     'rest_framework',
     'djcelery',
+    'redisboard',
 )
 
 OUR_APPS = (
