@@ -1,4 +1,3 @@
-from .base import *
 from .celery_settings import *
 
 try:

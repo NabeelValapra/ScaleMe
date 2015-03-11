@@ -21,3 +21,15 @@ CELERY_RESULT_SERIALIZER = 'json'
 # CELERY_DEFAULT_EXCHANGE = 'tasks'
 # CELERY_DEFAULT_EXCHANGE_TYPE = 'topic'
 # CELERY_DEFAULT_ROUTING_KEY = 'task.default'
+
+
+# """
+#     Needed to add:
+#     1. Retries.
+#     2. Email to admin if something failed.
+#     3. Arrange the app configration for a sepreate application,
+#        so its easy to create seperate celery application and to configure.
+#     4. "http://docs.celeryproject.org/en/latest/userguide/routing.html",
+#     5. "http://docs.celeryproject.org/en/latest/userguide/monitoring.html",
+#     6. Using monitors.
+# """

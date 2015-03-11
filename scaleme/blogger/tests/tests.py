@@ -1,4 +1,8 @@
-from django.test import TestCase
+import pytest
 
-# Create your tests here.
-print 'Have not done anything yet...'
+@pytest.mark.django_db
+class TestBlog:
+
+    def test_url(self, client):
+        response = client.get('/blogger/api/')
+        assert response.status_code == 200
