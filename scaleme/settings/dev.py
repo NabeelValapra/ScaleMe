@@ -2,7 +2,6 @@ from base import *
 
 INSTALLED_APPS += ('debug_toolbar',)
 DEBUG_TOOLBAR_PANELS = [
-    'cache_panel.CachePanel',
     'debug_toolbar.panels.timer.TimerPanel',
     'debug_toolbar.panels.settings.SettingsPanel',
     'debug_toolbar.panels.headers.HeadersPanel',
@@ -15,7 +14,8 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.redirects.RedirectsPanel',
 ]
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -41,6 +41,17 @@ SERVER_EMAIL = 'pymailone@gmail.com'
 #         'LOCATION': '/var/run/redis/redis.sock'
 #         },
 # }
+CACHES = {
+# Use unix socket connection,refer django-redis.
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': 'localhost:6379',
+        'KEY_PREFIX': 'TESAMPLE:',
+        'OPTIONS': {
+            'DB': 1,
+        },
+    },
+}
 
 LOGGING = {
     'version': 1,
