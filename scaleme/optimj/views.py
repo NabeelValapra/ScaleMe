@@ -4,13 +4,12 @@ from django.shortcuts import render_to_response
 
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
+
 import logging
 logger = logging.getLogger("OptimJJ")
 
 
-
 def add(request):
-    
     form = AddressBookForm()
     ca = cache.get('Sample', None)
     if ca == None:

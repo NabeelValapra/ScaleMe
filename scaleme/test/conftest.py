@@ -1,5 +1,13 @@
+# -*- coding: utf-8 -*-
+# Standard Library
 import os
 
-def pytest_configure(config):
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+# Third Party Stuff
+import django
+# import pytest
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.test")
+
+
+def pytest_configure(config):
+    django.setup()
