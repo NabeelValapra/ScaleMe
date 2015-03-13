@@ -1,6 +1,6 @@
 from django.template.context import RequestContext
 from forms import AddressBookForm
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, HttpResponse
 
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
@@ -24,6 +24,6 @@ def add(request):
         form = AddressBookForm(request.POST)
         if form.is_valid():
             form.save()
-            
+            return HttpResponse("You entry has successfully saved to our database. Thanks.!!")
 
     return render_to_response('sample.html', {'form':form}, RequestContext(request))
