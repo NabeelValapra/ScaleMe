@@ -8,11 +8,10 @@ class AddressBookForm(forms.ModelForm):
         model = AddressBook
         fields = '__all__'
     
-    def clean_phone(self):
-        num = self.cleaned_data['phone']
-        raise forms.ValidationErro("Testing validation error in pytest")
-        if num != '123':
-            raise forms.ValidationError("Your test a clean is Successfull. !!!")
+    # def clean_phone(self):
+    #     num = self.cleaned_data['phone']
+    #     if num != '123':
+    #         raise forms.ValidationError("Your test a clean is Successfull. !!!")
         
-        return num
+    #     return num
 

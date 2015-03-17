@@ -1,12 +1,33 @@
 <html>
-    <title>
-        Optim J
-    </title>
+    <head>
+        {% load static %}
+        <title> Optim J </title>    
+    </head>
     <body>
-        <form action="." method="post">
+        <form id='post-form' action="." method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="GO SUBMIT">
         </form>
     </body>
+    <script type="text/javascript" src="{% static 'optimj/jquery.min.js' %}"> </script>
+    <script type="text/javascript" src="{% static 'optimj/scaleForm.js' %}"></script>
+    <script type="text/javascript">
+        $('#post-form').on('submit', function(event){
+            event.preventDefault();
+            var options = { 
+                url: '{% url "optimj:ajax-address-book" %}',
+                data: $(this).serialize(),
+                type: $(this).attr('method'),
+                dataType:  'json', 
+                beforeSend: beforeCheck,
+                success: formResponseRedirect
+            };
+            function formResponseRedirect(data){
+                formResponse(data, errorFunc=showFieldError, redirect=true);
+
+            }
+            $.ajax(options)
+        });
+    </script>
 </html>
