@@ -4,7 +4,7 @@
         <title> Optim J </title>    
     </head>
     <body>
-        <form id='post-form' action="." method="post">
+        <form id='post-form' action="{% url 'optimj:ajax-address-book' %}" method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="GO SUBMIT">
@@ -13,21 +13,23 @@
     <script type="text/javascript" src="{% static 'optimj/jquery.min.js' %}"> </script>
     <script type="text/javascript" src="{% static 'optimj/scaleForm.js' %}"></script>
     <script type="text/javascript">
-        $('#post-form').on('submit', function(event){
-            event.preventDefault();
-            var options = { 
-                url: '{% url "optimj:ajax-address-book" %}',
-                data: $(this).serialize(),
-                type: $(this).attr('method'),
-                dataType:  'json', 
-                beforeSend: beforeCheck,
-                success: formResponseRedirect
-            };
-            function formResponseRedirect(data){
-                formResponse(data, errorFunc=showFieldError, redirect=true);
-
-            }
-            $.ajax(options)
+        $(document).ready(function (){
+            $('#post-form').on('submit', function(event){
+                event.preventDefault();
+                var $this = $(this)
+                var options = { 
+                    url: $this.attr('action'),
+                    data: $this.serialize(),
+                    type: $this.attr('method'),
+                    dataType:  'json', 
+                    beforeSend: beforeCheck,
+                    success: formResponseRedirect
+                };
+                function formResponseRedirect(data){
+                    formResponse(data, errorFunc=showFieldError, redirect=true);
+                }
+                $.ajax(options)
+            });
         });
     </script>
 </html>
